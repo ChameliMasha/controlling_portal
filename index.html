@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Data from Flask</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="content">
+        <!-- Content will be dynamically updated here -->
+    </div>
+
+    <script>
+        function loadStartData() {
+            $.ajax({
+                type: "POST",
+                url: "http://127.0.0.1:8080/start",
+                success: function(response) {
+                    document.getElementById("content").innerHTML = response;
+                }
+            });
+        }
+
+        function loadShowData() {
+            $.ajax({
+                type: "GET",
+                url: "http://127.0.0.1:8080/show?key1=value1&key2=value2", // Replace with actual parameters
+                success: function(response) {
+                    document.getElementById("content").innerHTML = JSON.stringify(response);
+                }
+            });
+        }
+
+        // You can call these functions based on user interactions or any specific triggers
+        // For example:
+        //loadStartData(); // This can be triggered when the page loads
+        loadShowData(); // You can call this function when needed
+    </script>
+</body>
+</html>

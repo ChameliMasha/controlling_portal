@@ -1,0 +1,22 @@
+.custom-box {
+    width: 400px;
+    height: 500px;
+    background-color: rgba(200, 215, 221, 0.5);
+    /* Background color with opacity */
+    border: 2px solid #b2b6b8;
+    border-radius: 5px;
+    /* Rounded corners */
+    margin: auto;
+    /* Center horizontally */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+        /* Use flexbox */
+    justify-content: center;
+        /* Center horizontally */
+    /* align-items: center; */
+    /* Center vertically */
+}
