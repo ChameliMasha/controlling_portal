@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Loading Page</title>
+    <style>
+      /* Center the spinner and data display */
+      .container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Style the spinner */
+      .spinner {
+        border: 5px solid rgba(0, 0, 0, 0.1);
+        border-top: 5px solid #333;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        display: block;
+      }
+
+      /* Style the "Loading" text */
+      .loading-text {
+        font-size: 24px;
+        margin-top: 20px;
+      }
+
+      /* Hide data display initially */
+      .data-container {
+        display: none;
+        width: 60%;
+        border: 2px solid #333;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+      }
+
+      /* Define data display styles */
+      .data-container h2 {
+        text-align: center;
+      }
+
+      /* Style the list */
+      .data-container ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      /* Style list items */
+      .data-container li {
+        margin-bottom: 10px;
+        padding: 8px;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+
+      .data-container li span {
+        font-weight: bold;
+      }
+
+      /* Spinner animation */
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="spinner" id="spinnerContainer"></div>
+      <div class="loading-text">Loading</div>
+
+      <div class="data-container" id="dataDisplay">
+        <h2>Data</h2>
+        <ul id="dataList">
+          <!-- Data will be displayed here dynamically -->
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const showParam = urlParams.get("show_data");
+
+        if (showParam !== "True") {
+          document.getElementById("spinnerContainer").style.display = "none";
+          document.getElementById("dataDisplay").style.display = "block";
+
+          const dataContainer = document.getElementById("dataList");
+          const variableSet = [
+            { name: "UID", value: urlParams.get("uid") },
+            { name: "DV", value: urlParams.get("dv") },
+            { name: "DI", value: urlParams.get("di") },
+            { name: "IV", value: urlParams.get("iv") },
+            { name: "CV", value: urlParams.get("cv") },
+            { name: "II", value: urlParams.get("ii") },
+          ];
+
+          variableSet.forEach((variable) => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `<span>${variable.name} :</span> ${variable.value}`;
+            dataContainer.appendChild(listItem);
+          });
+        } else {
+          document.getElementById("spinnerContainer").style.display = "block";
+          document.getElementById("dataDisplay").style.display = "none";
+        }
+      };
+    </script>
+  </body>
+</html>

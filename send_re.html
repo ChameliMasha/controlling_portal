@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Server Response Example</title>
+    <style>
+      /* Styles for the container */
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      /* Box styling for the data */
+      .data-box {
+        border: 2px solid #3498db;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+        width: 300px;
+        display: block; /* Use flexbox */
+        justify-content: center; /* Center content horizontally */
+        align-items: center;
+        background-color: rgb(232, 245, 248);
+      }
+
+      /* Styles for the spinner */
+      .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Styles for the button */
+      #submitBtn {
+        padding: 10px 20px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        justify-content: center;
+        align-self: center;
+      }
+
+      #submitBtn:hover {
+        background-color: #2980b9;
+      }
+
+      /* Styles for the dropdown */
+      .dropdown {
+        position: flex;
+        display: inline-block;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .dropdown-content a:hover {
+        background-color: #f1f1f1;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .blank-box {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border: 1px solid #000;
+        border-right: none;
+        border-top: none;
+        transform: rotate(-45deg);
+        margin-right: 5px;
+      }
+
+      select#browser {
+        width: 100px; /* Adjust the width as needed */
+        font-size: 16px; /* Adjust the font size as needed */
+        padding: 8px; /* Adjust the padding as needed */
+        border: 1px solid #ccc;
+        border-radius: 5px;/* Add any other styles you want for the select box */
+        background-color: rgb(232, 245, 248);
+      }
+
+      /* Style for the options within the select element */
+      select#browser option {
+        font-size: 16px; /* Adjust the font size of options as needed */
+        /* Add any other styles you want for the options */
+      }
+
+      .submit-box {
+        align-self: center;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        margin-top: 20px;
+      }
+
+      .data-container {
+        font-family: Arial, sans-serif;
+      }
+
+      .data {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex-wrap: nowrap;
+        align-items: center;
+      }
+
+      .data-item {
+        display: flex;
+        align-items: center;
+      }
+
+      label {
+        font-weight: bold;
+        width: 80px; /* Adjust width as needed */
+      }
+
+      .value {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 5px 8px;
+        min-width: 50px; /* Adjust width as needed */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="content" class="data-box">
+        <h2>Wait... Readings are in progress</h2>
+        <!-- This is where the data or spinner will be displayed -->
+        <div id="dataSection"></div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      let dataFetchInterval; // Variable to hold the interval reference
+
+      function startDataFetching() {
+        fetchDataAndUpdate(); // Start fetching data immediately
+        dataFetchInterval = setInterval(fetchDataAndUpdate, 2000); // Start the interval again
+      }
+
+      function stopDataFetching() {
+        clearInterval(dataFetchInterval); // Clear the interval to stop sending requests
+      }
+
+      // Function to set the LED status in the box
+      function setLEDStatus(status) {
+        const ledStatusBox = document.getElementById("ledStatusBox");
+        ledStatusBox.innerText = status;
+      }
+
+      function sendDataToServer(dataToSend) {
+        $.ajax({
+          url: "http://127.0.0.1:5000/store_data",
+          type: "POST",
+          data: JSON.stringify(dataToSend),
+          contentType: "application/json",
+          success: function (response) {
+            console.log("Data stored successfully:", response);
+          },
+          error: function (xhr, status, error) {
+            console.error("Error storing data:", error);
+          },
+        });
+      }
+      // let ledStatus = "";
+      function fetchDataAndUpdate() {
+        $.ajax({
+          url: "http://127.0.0.1:5000/get_data",
+          type: "GET",
+          success: function (response) {
+            console.log(response);
+            const contentDiv = document.getElementById("content");
+            const send_data = response.send_data;
+            console.log("Value of UID:", response.UID);
+            console.log("Value of send_data:", send_data);
+
+            if (send_data != 2) {
+              // Display a spinner
+              contentDiv.innerHTML = '<div class="spinner"></div>';
+            } else {
+              stopDataFetching();
+              // Display the received data
+              // let ledStatus = ""; // Store the selected LED status here
+
+              contentDiv.innerHTML = `<div class="data-container">
+                <h2>Received Data:</h2>
+                <div class="data">
+                  <div class="data-item">
+                    <label>UID</label>
+                    <div class="value">${response.UID}</div>
+                  </div>
+                  <div class="data-item">
+                    <label>II</label>
+                    <div class="value">${response.II}</div>
+                  </div>
+                  <div class="data-item">
+                    <label>CI</label>
+                    <div class="value">${response.CI}</div>
+                  </div>
+                  <div class="data-item">
+                    <label>CV</label>
+                    <div class="value">${response.CV}</div>
+                  </div>
+                  <div class="data-item">
+                    <label>DI</label>
+                    <div class="value">${response.DI}</div>
+                  </div>
+                  <div class="data-item">
+                    <label>DV</label>
+                    <div class="value">${response.DV}</div>
+                  </div>
+                </div>
+              </div>
+              <div style="align-items: center; margin:20px">
+                <label for="browser" style="align-items: center">LED sequence:</label>
+                <select id="browser">
+                  <option value="" disabled selected></option>
+                  <option value="Pass">Pass</option>
+                  <option value="Fail">Fail</option>
+                </select>
+              </div>
+              <div class="submit-box">
+                <button id="submitBtn">Submit</button>
+              </div>`;
+
+              document
+                .getElementById("browser")
+                .addEventListener("change", function (event) {
+                  ledStatus = event.target.value; // Capture the selected LED status
+                });
+
+              // Attach click event listener AFTER updating content
+              document
+                .getElementById("submitBtn")
+                .addEventListener("click", function () {
+                  // Include LED status in the data to be clicksent
+                  sendDataToServer({ ...response, LED_status: ledStatus });
+                  startDataFetching(); // Restart fetching data after submission
+                });
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error(error);
+          },
+        });
+      }
+
+      // Function to set the LED status in the box
+      function setLEDStatus(status) {
+        document.getElementById("ledStatusBox").innerText = status;
+      }
+
+      // Attach the event listener when the DOM is loaded
+      document.addEventListener("DOMContentLoaded", startDataFetching);
+    </script>
+  </body>
+</html>

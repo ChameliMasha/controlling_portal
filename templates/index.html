@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Johan's Store</title>
+    </head>
+
+    <body>
+        <center><h1>Johan's Store</h1></center>
+        <center><p>Best merch in the game</p></center>
+        <center><h2>Popular Products</h2></center>
+        {% for product in popular_products %}
+            <h3>Product Name : {{product.name}}</h3>
+            <img src= {{product.img}}>
+            <h4>Size : {{ product.size }}</h4>
+            <h5>Price : £{{ product.price }}</h5>
+        {% endfor %}
+    </body>
+</html>
