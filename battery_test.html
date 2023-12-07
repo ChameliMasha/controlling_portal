@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Server Response Example</title>
+    <link rel="stylesheet" href="style.css" />
     <style>
       /* Styles for the container */
       .container {
@@ -106,7 +107,7 @@
         font-size: 16px; /* Adjust the font size as needed */
         padding: 8px; /* Adjust the padding as needed */
         border: 1px solid #ccc;
-        border-radius: 5px;/* Add any other styles you want for the select box */
+        border-radius: 5px; /* Add any other styles you want for the select box */
         background-color: rgb(232, 245, 248);
       }
 
@@ -126,6 +127,8 @@
 
       .data-container {
         font-family: Arial, sans-serif;
+        align-items: center;
+        justify-content: center;
       }
 
       .data {
@@ -148,17 +151,39 @@
       }
 
       .value {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         border: 1px solid #ccc;
         border-radius: 5px;
-        padding: 5px 8px;
-        min-width: 50px; /* Adjust width as needed */
+        padding: 8px 8px;
+        min-width: 80px; /* Adjust width as needed */
+
+      }
+
+
+      .center-text {
+        text-align: center; /* Horizontally center the text */
+        margin-top: 20px; /* Remove default margin */
+      }
+
+      .waiting-msg{
+        font-size: medium;
+        align-items: center;
+        display: flex;
+        justify-content: center;
       }
     </style>
   </head>
   <body>
+    <div class="topnav">
+      <a href="battery_test.html" class="active">Battery Test</a>
+      <a href="pcb_test.html">PCB Test</a>
+      <!-- <a href="#contact">Contact</a> -->
+    </div>
     <div class="container">
       <div id="content" class="data-box">
-        <h2>Wait... Readings are in progress</h2>
+        <h2 class="waiting-msg">No device available to read data.</h2>
         <!-- This is where the data or spinner will be displayed -->
         <div id="dataSection"></div>
       </div>
@@ -209,24 +234,25 @@
             console.log("Value of UID:", response.UID);
             console.log("Value of send_data:", send_data);
 
-            if (send_data != 2) {
+            if (send_data == 1) {
               // Display a spinner
-              contentDiv.innerHTML = '<div class="spinner"></div>';
-            } else {
+              //contentDiv.innerHTML = '<div class="spinner"></div>';
+              contentDiv.innerHTML = '<div class="spinner"></div><p>Data is being processed...</p>';
+            } else if (send_data == 2){
               stopDataFetching();
               // Display the received data
               // let ledStatus = ""; // Store the selected LED status here
 
               contentDiv.innerHTML = `<div class="data-container">
-                <h2>Received Data:</h2>
+                <h2 class="center-text">Battery Test</h2>
                 <div class="data">
                   <div class="data-item">
                     <label>UID</label>
                     <div class="value">${response.UID}</div>
                   </div>
                   <div class="data-item">
-                    <label>II</label>
-                    <div class="value">${response.II}</div>
+                    <label>IV</label>
+                    <div class="value">${response.IV}</div>
                   </div>
                   <div class="data-item">
                     <label>CI</label>
@@ -247,7 +273,7 @@
                 </div>
               </div>
               <div style="align-items: center; margin:20px">
-                <label for="browser" style="align-items: center">LED sequence:</label>
+                <label for="browser" style="justify-content:middle; align-items: center">LED sequence:</label>
                 <select id="browser">
                   <option value="" disabled selected></option>
                   <option value="Pass">Pass</option>
@@ -272,6 +298,9 @@
                   sendDataToServer({ ...response, LED_status: ledStatus });
                   startDataFetching(); // Restart fetching data after submission
                 });
+            }
+            else{
+              contentDiv.innerHTML = '<div class="spinner"></div>';
             }
           },
           error: function (xhr, status, error) {

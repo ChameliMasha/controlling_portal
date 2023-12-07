@@ -8,6 +8,7 @@ from firebase_admin import firestore
 from flask import request
 import threading
 
+
 # Initialize Firebase Admin SDK with your service account credentials
 cred = credentials.Certificate('private_key.json')
 firebase_admin.initialize_app(cred)
@@ -23,24 +24,25 @@ CORS(app)
 
 # Define the serial port and baud rate
 uid=""
-ii=0  
-ci=0
 cv=0
-di=0
+ci=0
 dv=0
+di=0
+iv=0
+# ii=0  
 LED_status = ""   
 send_data = 0
-response_data = []
+response_data = []   
 
 @app.route('/get_data', methods=['GET'])
 def get_data():
-    global uid, cv, ci, dv, di, ii, LED_status, send_data, response_data
+    global uid, cv, ci, dv, di, iv, LED_status, send_data, response_data
     # send_data = 2
     if send_data == 2:
         response_data = {
             "send_data": send_data,
             "UID": uid,
-            "II": ii,
+            "IV": iv,
             "CI": ci,
             "CV": cv,
             "DI": di,
@@ -71,7 +73,7 @@ def store_data():
 
     # Access inDIvidual attributes from the JSON data
     uid = data.get('UID')
-    ii = data.get('II')
+    iv = data.get('IV')
     ci = data.get('CI')
     cv = data.get('CV')
     di = data.get('DI')
@@ -81,7 +83,7 @@ def store_data():
     # Create a DIctionary to store in Firestore
     data_to_store = {
         "UID": uid,
-        "II": ii,
+        "IV": iv,
         "CI": ci,
         "CV": cv,
         "DI": di,
@@ -96,75 +98,60 @@ def store_data():
     counter_ref.set({'current_id': next_id})
 
     return 'Data stored successfully', 200
-    
 
-ser = serial.Serial('COM4', 9600)  # Update 'COM1' with your speCIfic port and 9600 with your baud rate
+
+ser = serial.Serial('COM3', 9600)  # Update 'COM1' with your specific port and 9600 with your baud rate
 def read_serial_data(serial_port):
-    # print("comes here")
-    global uid, cv, ci, dv, di, ii, LED_status, send_data, response_data
-
-    global send_data, response_data
+    global uid, cv, ci, dv, di, iv, LED_status, send_data, response_data
     try:
-        count = 0
         while True:
-            
             # Read a line from the serial port
-            #print(f"this is serail data:{serial_port.readline()} ")
             line = serial_port.readline().decode('utf-8').strip()
-            
+            #print(serial_port.readline())
             # Print the received data
             print(f"Received: {line}")
-            # print(send_data)
             # Read a line from the serial port
             line = ser.readline().decode('utf-8').strip()
         
             # Print the received data
             print(f"Received: {line}")
-            # print(send_data)
             parts = line.split(':')
             label = parts[0].strip()
             value = parts[1].strip()
-
-            print(label)
            # print(label)
            # print(value)
             if(label =="uid"):
-                count= count+1
                 uid = value
                 print(f"UID:{uid}")
             elif(label == "cv"):
-                count= count+1
                 cv=float(value)
-                print(f"CV:{cv}")
+                print(f"cv:{cv}")
             elif(label=="ci"):
-                count= count+1
                 ci =float(value)
-                print(f"CI:{ci}")
+                print(f"ci:{ci}")
             elif(label=="dv"):
                 dv =float(value)
-                print(f"DV:{dv}")
+                print(f"dv:{dv}")
             elif(label=="di"):
-                count= count+1
                 di =float(value)
-                print(f"DI:{di}")
+                print(f"di:{di}")
+            # elif(label=="iv"):
+            #     iv=float(value)
+            #     print(f"iv:{iv}")
             elif(label=="iv"):
-                count= count+1
-                iv=float(value)
-                print(f"IV:{iv}")
-            elif(label=="ii"):
-                count= count+1
-                ii =float(value)
-                print(f"II:{ii}")
+                iv =float(value)
+                print(f"iv:{iv}")
             elif(label=="show"):
                 send_data = 2
                 print("show")
-                count = 0
                 # print(send_data)
             elif(label=="start"):
                 send_data = 1
                 print("start")
-
-            # print(response_data)
+            # Check if the user wants to stop
+           # user_input = input("Enter 'stop' to close the serial port: ")
+           # if user_input.lower() == 'stop':
+             #   break
 
     finally:
         # Close the serial port when the loop is terminated
@@ -173,17 +160,7 @@ def read_serial_data(serial_port):
 
 def main():
     # Define the serial port and baud rate
-    
 
-    # Start a thread for reading serial data
-    # serial_thread = threading.Thread(target=read_serial_data)
-    # serial_thread.daemon = True
-    # serial_thread.start()
-
-     
-
-    # Run the Flask app
-    
     
     try:
         read_serial_data(ser)
@@ -194,10 +171,7 @@ def main():
         ser.close()
 
 if __name__ == "__main__":
-
     serial_thread = threading.Thread(target=main)
     serial_thread.start()
 
     app.run(host='0.0.0.0', port=5000)
-    # main()
-     
